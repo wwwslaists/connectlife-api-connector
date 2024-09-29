@@ -147,26 +147,33 @@ class ConnectlifeApiService
         return $acDevices;
     }
 
-    public function devices(?string $deviceId = null): array
-    {
-        $devicesData = $this->decodeJsonResponse(
-            $this->httpClient->get('https://connectlife.bapi.ovh/appliances', [
-                RequestOptions::HEADERS => ['X-Token' => $this->getAccessToken()]
-            ])
-        );
+   public function devices(?string $deviceId = null): array
+   {
+       $url = 'https://connectlife.bapi.ovh/appliances';
+       $headers = ['X-Token' => $this->getAccessToken()];
 
-        Log::debug('Devices status.', $devicesData);
+       Log::info('HTTP GET Request', [
+           'url' => $url,
+           'headers' => $headers
+       ]);
 
-        if (null === $deviceId) {
-            return $devicesData;
-        }
+       $devicesData = $this->decodeJsonResponse(
+           $this->httpClient->get($url, [
+               RequestOptions::HEADERS => $headers
+           ])
+       );
 
-        foreach ($devicesData as $device) {
-            if ($device['deviceId'] === $deviceId) {
-                return $device;
-            }
-        }
+       Log::info('Devices status.', $devicesData);
 
-        return [];
-    }
-}
+       if (null === $deviceId) {
+           return $devicesData;
+       }
+
+       foreach ($devicesData as $device) {
+           if ($device['deviceId'] === $deviceId) {
+               return $device;
+           }
+       }
+
+       return [];
+   }
